@@ -1,0 +1,28 @@
+# [JetBrains 전용]
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+cmake-build-*/
+
+# [C# / .NET 전용]
+bin/
+obj/
+*.exe
+*.pdb
+*.dll
+
+# [Visual Studio 관련 (Rider 사용 시 생성될 수 있음)]
+.vs/
+TestResults/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# [OS 및 기타 전용]
+.DS_Store
+Thumbs.db
+log/
+*.log
