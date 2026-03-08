@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 public class Solution {
     public int solution(int bridge_length, int weight, int[] truck_weights) {
-        // [네 원형 100% 유지]
         int answer = 0;
         Dictionary<int, int> truckDictionary = new Dictionary<int, int>();
         Queue<int> truckQueue = new Queue<int>();
