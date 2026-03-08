@@ -1,15 +1,18 @@
-
-import java.util.HashMap;
+import java.util.Arrays;
 
 class Solution {
-    public int solution(int[] nums) {
-        int answer = 0;
-        int canHave = nums.length / 2;
-        HashMap<Integer, Integer> map = new HashMap<>();
-        for (int num : nums) {
-            map.put(num, map.getOrDefault(num, 0) + 1);
+    public boolean solution(String[] phone_book) {
+        boolean answer = true;
+        if(phone_book.length == 1) {
+            return answer;
         }
-        answer = Math.min(canHave, map.size());
+        Arrays.sort(phone_book);
+        for(int i = 0; i < phone_book.length - 1; i++) {
+            if(phone_book[i + 1].startsWith(phone_book[i])) {
+                answer = false;
+                break;
+            }
+        }   
         return answer;
     }
 }
