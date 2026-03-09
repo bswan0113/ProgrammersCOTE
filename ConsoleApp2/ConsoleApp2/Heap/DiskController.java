@@ -3,7 +3,6 @@ import java.util.PriorityQueue;
 
 class Solution {
     public int solution(int[][] jobs) {
-        int answer = 0;
         int totalWaitTime = 0;
         HardDisk hardDisk = new HardDisk();
         
@@ -18,92 +17,83 @@ class Solution {
         PriorityQueue<WaitWorker> allWorker = new PriorityQueue<>((x, y) -> Integer.compare(x.requestTime, y.requestTime));
         
         for (int i = 0; i < jobs.length; i++) {
-            WaitWorker work = new WaitWorker(i, jobs[i][0], jobs[i][1]);
-            allWorker.offer(work);
+            allWorker.offer(new WaitWorker(i, jobs[i][0], jobs[i][1]));
         }
 
         int globalTime = 0;
 
-        while (!allWorker.isEmpty() || !waitQueue.isEmpty()) {
-            WaitWorker nextWork = allWorker.peek();
+        while (!allWorker.isEmpty() || !waitQueue.isEmpty() || hardDisk.IsWorking()) {
             
-            if (nextWork != null && nextWork.requestTime == globalTime) {
-                WaitWorker work = allWorker.poll();
-                waitQueue.offer(work);
+            while (!allWorker.isEmpty() && allWorker.peek().requestTime <= globalTime) {
+                waitQueue.offer(allWorker.poll());
             }
 
-            if (hardDisk.IsWorking()) {
-                WorkResult isWorkEnd = hardDisk.Work();
-                totalWaitTime += isWorkEnd.totalWorkTime;
-                hardDisk.StartWorking(waitQueue.poll());
-            } else {
-                hardDisk.StartWorking(waitQueue.poll());
-            }
-            for(int i=0; i<waitQueue.size(); i++) {
-                waitQueue.peek().WaitTick();
+            if (!hardDisk.IsWorking()) {
+                if (waitQueue.isEmpty()) {
+                    globalTime = allWorker.peek().requestTime;
+                    continue;
+                }
+                hardDisk.StartWorking(waitQueue.poll(), globalTime);
             }
 
-            globalTime++;
+            WorkResult result = hardDisk.SkipToEnd();
+            globalTime = result.endTime;
+            totalWaitTime += result.totalWorkTime;
+            while (!allWorker.isEmpty() && allWorker.peek().requestTime <= globalTime) {
+                waitQueue.offer(allWorker.poll());
+            }
         }
-        answer = totalWaitTime / jobs.length;
 
-        return answer;
+        return totalWaitTime / jobs.length;
     }
 
     class WaitWorker {
         public int num;
         public int requestTime;
         public int timeTaken;
-        public int waitTime;
 
         public WaitWorker(int num, int requestTime, int timeTaken) {
             this.num = num;
             this.requestTime = requestTime;
             this.timeTaken = timeTaken;
         }
-
-        public void WaitTick() {
-            waitTime++;
-        }
     }
 
     class WorkResult {
         public boolean isWorkEnd;
         public int totalWorkTime;
+        public int endTime;
         
-        public WorkResult(boolean isWorkEnd, int totalWorkTime) {
+        public WorkResult(boolean isWorkEnd, int totalWorkTime, int endTime) {
             this.isWorkEnd = isWorkEnd;
             this.totalWorkTime = totalWorkTime;
+            this.endTime = endTime;
         }
     }
 
     class HardDisk {
         private WaitWorker _currentWorker;
-        private int _workingTime;
+        private int _startTime;
 
         public boolean IsWorking() {
             return _currentWorker != null;
         }
 
-        public void StartWorking(WaitWorker worker) {
+        public void StartWorking(WaitWorker worker, int currentTime) {
             _currentWorker = worker;
-            Work();
+            _startTime = currentTime;
         }
 
-        public WorkResult Work() {
-            if (_currentWorker == null) return new WorkResult(false, 0);
-            _workingTime++;
-            if (_workingTime == _currentWorker.timeTaken) {
-                int totalWorkTime = _workingTime - _currentWorker.waitTime;
-                EndWorking();
-                return new WorkResult(true, totalWorkTime);
-            }
-            return new WorkResult(false, 0);
+        public WorkResult SkipToEnd() {
+            int endTime = _startTime + _currentWorker.timeTaken;
+            int totalWorkTime = endTime - _currentWorker.requestTime;
+            EndWorking();
+            return new WorkResult(true, totalWorkTime, endTime);
         }
 
         private void EndWorking() {
             _currentWorker = null;
-            _workingTime = 0;
+            _startTime = 0;
         }
     }
 }
