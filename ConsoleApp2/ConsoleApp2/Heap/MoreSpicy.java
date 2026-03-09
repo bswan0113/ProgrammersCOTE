@@ -7,11 +7,9 @@ class Solution {
         int resultScoville = 0;
         PriorityQueue<Integer> pq = new PriorityQueue<>();
         for (int i : scoville) {
-            if(i < K) {
-                pq.offer(i);
-            }   
+            pq.offer(i);
         }
-        while(!pq.isEmpty()){
+        while(pq.peek() < K){
             if(pq.size() == 1){
                 if(pq.poll() < K){
                     return -1;
@@ -22,12 +20,9 @@ class Solution {
             int first = pq.poll();
             int second = pq.poll();
             resultScoville = first + (second * 2);
-            if(resultScoville < K){
-                pq.offer(resultScoville);
-            }
+            pq.offer(resultScoville);
             answer++;
         }
-
         return answer;
     }
 }
