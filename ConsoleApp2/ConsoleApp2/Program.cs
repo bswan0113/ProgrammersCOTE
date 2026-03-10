@@ -1,6 +1,6 @@
 ﻿
 Solution solution = new Solution();
 
-int n = 9;
-int[,] arr = new int[,] { {1,3}, {2,3}, {3,4}, {4,5}, {4,6}, {4,7}, {7,8}, {7,9} };
-solution.solution(9,arr );
+int n = 4;
+int[,] arr = new int[,] { {0,1,1}, {0,2,2}, {1,2,5},{1,3,1},{2,3,8}};
+solution.solution(n,arr );
